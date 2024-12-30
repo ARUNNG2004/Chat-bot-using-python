@@ -7,7 +7,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import LabelEncoder
 import ssl
-from datetime import datetime, UTC
+from datetime import datetime, timezone
 
 # Page configuration
 st.set_page_config(
