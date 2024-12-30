@@ -18,32 +18,11 @@ st.set_page_config(
 
 # Custom tokenizer function
 def simple_tokenize(text):
-    """
-    Simple tokenizer that splits text into words and handles basic cleaning
-    """
-    # Convert to lowercase
     text = text.lower()
-    # Replace any non-alphanumeric characters with spaces
     text = re.sub(r'[^a-z0-9\s]', ' ', text)
-    # Split on whitespace and filter out empty strings
     return [token for token in text.split() if token.strip()]
 
-# Common English stop words as a list, not a set
-STOP_WORDS = ['i', 'me', 'my', 'myself', 'we', 'our', 'ours', 'ourselves', 'you', 
-              "you're", "you've", "you'll", "you'd", 'your', 'yours', 'yourself', 
-              'yourselves', 'he', 'him', 'his', 'himself', 'she', "she's", 'her', 
-              'hers', 'herself', 'it', "it's", 'its', 'itself', 'they', 'them', 
-              'their', 'theirs', 'themselves', 'what', 'which', 'who', 'whom', 
-              'this', 'that', "that'll", 'these', 'those', 'am', 'is', 'are', 
-              'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'having', 
-              'do', 'does', 'did', 'doing', 'a', 'an', 'the', 'and', 'but', 'if', 
-              'or', 'because', 'as', 'until', 'while', 'of', 'at', 'by', 'for', 
-              'with', 'about', 'against', 'between', 'into', 'through', 'during', 
-              'before', 'after', 'above', 'below', 'to', 'from', 'up', 'down', 
-              'in', 'out', 'on', 'off', 'over', 'under', 'again', 'further', 
-              'then', 'once']
-
-# Default intents
+# Extended default intents with laptop-specific patterns
 DEFAULT_INTENTS = [
     {
         "tag": "greeting",
@@ -62,25 +41,59 @@ DEFAULT_INTENTS = [
             "Thanks for using our service. Have a great day!",
             "You're welcome! Come back anytime."
         ]
+    },
+    {
+        "tag": "laptop_recommendation",
+        "patterns": [
+            "I need a laptop",
+            "What laptop should I buy",
+            "Recommend me a laptop",
+            "Looking for a new laptop"
+        ],
+        "responses": [
+            "I can help you find a laptop! What's your budget range?",
+            "Let me help you find the perfect laptop. What will you primarily use it for?",
+            "I'll assist you in choosing a laptop. Do you have any specific requirements?"
+        ]
+    },
+    {
+        "tag": "budget",
+        "patterns": [
+            "My budget is",
+            "I can spend",
+            "Looking for laptops under",
+            "Price range"
+        ],
+        "responses": [
+            "I can suggest several good laptops in that price range. What will be your primary use case?",
+            "That's a workable budget. Are you looking for something more focused on performance or portability?",
+            "I can recommend several options in that range. Do you have any specific requirements like screen size or battery life?"
+        ]
     }
 ]
 
-# Load JSON file with error handling
+# Load JSON file with debugging
 @st.cache_data
 def load_intents():
     try:
-        with open('laptop.json', 'r', encoding='utf-8') as file:
-            return json.load(file)
-    except FileNotFoundError:
-        st.warning("Using default responses as 'laptop.json' was not found.")
-        return DEFAULT_INTENTS
-    except json.JSONDecodeError as e:
-        st.error(f"Error decoding JSON: {e}")
+        # First try to load from file
+        if os.path.exists('laptop.json'):
+            with open('laptop.json', 'r', encoding='utf-8') as file:
+                loaded_intents = json.load(file)
+                st.sidebar.success("Successfully loaded laptop.json")
+                return loaded_intents
+        else:
+            st.sidebar.warning("laptop.json not found, using default intents")
+            return DEFAULT_INTENTS
+    except Exception as e:
+        st.sidebar.error(f"Error loading intents: {str(e)}")
         return DEFAULT_INTENTS
 
+# Load intents and display debug info
 intents = load_intents()
+st.sidebar.write("Number of intent categories:", len(intents))
 
-# Extract patterns and tags
+# Extract and display patterns/tags info
 def prepare_training_data():
     patterns = []
     tags = []
@@ -91,83 +104,89 @@ def prepare_training_data():
     return patterns, tags
 
 patterns, tags = prepare_training_data()
+st.sidebar.write("Number of training patterns:", len(patterns))
 
-# Initialize vectorizer with custom tokenizer and list of stop words
+# Initialize vectorizer
 @st.cache_resource
 def create_vectorizer():
     return TfidfVectorizer(
         tokenizer=simple_tokenize,
-        stop_words='english',  # Using built-in English stop words instead of custom list
+        stop_words='english',
         min_df=1,
         max_features=5000
     )
 
 vectorizer = create_vectorizer()
 
-# Vectorize patterns with error handling
+# Vectorize patterns with debugging
 try:
     if patterns:
         X = vectorizer.fit_transform(patterns)
+        st.sidebar.success(f"Vectorization successful: {X.shape[0]} samples, {X.shape[1]} features")
     else:
         X = None
-        st.error("No patterns available for training.")
+        st.sidebar.error("No patterns available for training")
 except Exception as e:
-    st.error(f"Vectorization error: {e}")
+    st.sidebar.error(f"Vectorization error: {str(e)}")
     X = None
 
-# Encode tags
+# Encode tags with debugging
 tag_encoder = LabelEncoder()
 try:
     if tags:
         y = tag_encoder.fit_transform(tags)
+        st.sidebar.success(f"Tag encoding successful: {len(set(y))} unique tags")
     else:
         y = None
 except Exception as e:
-    st.error(f"Tag encoding error: {e}")
+    st.sidebar.error(f"Tag encoding error: {str(e)}")
     y = None
 
-# Initialize and train model
+# Train model with debugging
 @st.cache_resource
 def train_model(_X, _y):
     if _X is not None and _y is not None and len(set(_y)) > 1:
         try:
             model = LogisticRegression(max_iter=1000)
             model.fit(_X, _y)
+            st.sidebar.success("Model training successful")
             return model
         except Exception as e:
-            st.error(f"Model training error: {e}")
+            st.sidebar.error(f"Model training error: {str(e)}")
     return None
 
 model = train_model(X, y)
 
+# Enhanced response function with debugging
 def get_response(user_input):
-    """Generate chatbot response with comprehensive error handling"""
     if not model:
         return "I'm still learning. Please try again in a moment."
     
     try:
-        # Preprocess and vectorize user input
         processed_input = vectorizer.transform([user_input])
-        
-        # Predict intent
         intent_index = model.predict(processed_input)[0]
         predicted_tag = tag_encoder.inverse_transform([intent_index])[0]
         
-        # Find matching intent and return random response
+        # Debug information
+        st.sidebar.write("Predicted tag:", predicted_tag)
+        
         for intent in intents:
             if intent["tag"] == predicted_tag:
-                return random.choice(intent["responses"])
+                response = random.choice(intent["responses"])
+                st.sidebar.write("Found matching intent")
+                return response
         
         return "I'm not sure how to respond to that. Could you rephrase your question?"
     
     except Exception as e:
-        return f"I encountered an error processing your request. Please try again with a different question."
+        st.sidebar.error(f"Response error: {str(e)}")
+        return "I encountered an error. Please try again with a different question."
 
 # Initialize session state
 if 'conversation_history' not in st.session_state:
     st.session_state.conversation_history = []
 
-# Main title and description
+# Main UI layout
 st.title("AI Laptop Advisor")
 st.subheader("Intelligent Laptop Recommendations & Support")
 
@@ -175,14 +194,13 @@ st.subheader("Intelligent Laptop Recommendations & Support")
 menu = ["Home", "Conversation History", "About"]
 choice = st.sidebar.selectbox("Menu", menu)
 
-# Display current time
+# Display current time and user
 st.sidebar.write(f"Current Time (UTC): {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S')}")
 st.sidebar.write(f"User: ARUNNG2004")
 
 if choice == "Home":
     st.subheader("Chat with the Bot")
     
-    # Input for user query
     user_input = st.text_input("You:", placeholder="Type your message here...")
     
     if user_input:
@@ -193,14 +211,12 @@ if choice == "Home":
             with st.spinner('Getting response...'):
                 response = get_response(user_input)
                 
-                # Save to conversation history
                 st.session_state.conversation_history.append({
                     "timestamp": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S"),
                     "user_message": user_input,
                     "bot_response": response
                 })
                 
-                # Display current exchange
                 st.write("**You:**", user_input)
                 st.write("**Bot:**", response)
 
@@ -220,7 +236,7 @@ elif choice == "Conversation History":
     else:
         st.info("No conversation history available.")
 
-elif choice == "About":
+else:
     st.subheader("About the Laptop Advisor Chatbot")
     st.write("""
     Welcome to the AI Laptop Advisor! This intelligent chatbot is designed to help you:
@@ -230,9 +246,6 @@ elif choice == "About":
     - Understand technical specifications
     - Compare different laptop models
     - Learn about the latest laptop trends
-    
-    The chatbot uses Natural Language Processing (NLP) and Machine Learning to understand
-    your queries and provide relevant, personalized responses.
     """)
     
     st.markdown("### How to Use")
