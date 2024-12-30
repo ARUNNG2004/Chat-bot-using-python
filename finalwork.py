@@ -105,7 +105,7 @@ def prepare_training_data():
     return patterns, tags
 
 patterns, tags = prepare_training_data()
-st.sidebar.write("Number of training patterns:", len(patterns))
+
 
 # Initialize vectorizer
 vectorizer = TfidfVectorizer(tokenizer=lambda text: re.findall(r'\b\w+\b', text.lower()), stop_words='english', min_df=1, max_features=5000)
