@@ -108,27 +108,18 @@ patterns, tags = prepare_training_data()
 st.sidebar.write("Number of training patterns:", len(patterns))
 
 # Initialize vectorizer
-@st.cache_resource
-def create_vectorizer():
-    return TfidfVectorizer(
-        tokenizer=simple_tokenize,
-        stop_words='english',
-        min_df=1,
-        max_features=5000
-    )
-
-vectorizer = create_vectorizer()
+vectorizer = TfidfVectorizer(tokenizer=lambda text: re.findall(r'\b\w+\b', text.lower()), stop_words='english', min_df=1, max_features=5000)
 
 # Vectorize patterns with debugging
 try:
     if patterns:
         X = vectorizer.fit_transform(patterns)
-        st.sidebar.success(f"Vectorization successful: {X.shape[0]} samples, {X.shape[1]} features")
+        print(f"Vectorization successful: {X.shape[0]} samples, {X.shape[1]} features")
     else:
         X = None
-        st.sidebar.error("No patterns available for training")
+        print("No patterns available for training")
 except Exception as e:
-    st.sidebar.error(f"Vectorization error: {str(e)}")
+    print(f"Vectorization error: {str(e)}")
     X = None
 
 # Encode tags with debugging
@@ -136,11 +127,11 @@ tag_encoder = LabelEncoder()
 try:
     if tags:
         y = tag_encoder.fit_transform(tags)
-        st.sidebar.success(f"Tag encoding successful: {len(set(y))} unique tags")
+        print(f"Tag encoding successful: {len(set(y))} unique tags")
     else:
         y = None
 except Exception as e:
-    st.sidebar.error(f"Tag encoding error: {str(e)}")
+    print(f"Tag encoding error: {str(e)}")
     y = None
 
 # Train model with debugging
@@ -150,10 +141,10 @@ def train_model(_X, _y):
         try:
             model = LogisticRegression(max_iter=1000)
             model.fit(_X, _y)
-            st.sidebar.success("Model training successful")
+            print("Model training successful")
             return model
         except Exception as e:
-            st.sidebar.error(f"Model training error: {str(e)}")
+            print(f"Model training error: {str(e)}")
     return None
 
 model = train_model(X, y)
