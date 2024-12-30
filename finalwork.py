@@ -72,7 +72,7 @@ DEFAULT_INTENTS = [
     }
 ]
 
-# Load JSON file with debugging
+# Load intents from JSON file or use defaults
 @st.cache_data
 def load_intents():
     try:
@@ -80,18 +80,19 @@ def load_intents():
         if os.path.exists('laptop.json'):
             with open('laptop.json', 'r', encoding='utf-8') as file:
                 loaded_intents = json.load(file)
-                st.sidebar.success("Successfully loaded laptop.json")
+                print("Successfully loaded laptop.json")  # Debug info printed to console
                 return loaded_intents
         else:
-            st.sidebar.warning("laptop.json not found, using default intents")
+            print("laptop.json not found, using default intents")  # Debug info printed to console
             return DEFAULT_INTENTS
     except Exception as e:
-        st.sidebar.error(f"Error loading intents: {str(e)}")
+        print(f"Error loading intents: {str(e)}")  # Debug info printed to console
         return DEFAULT_INTENTS
 
 # Load intents and display debug info
 intents = load_intents()
-st.sidebar.write("Number of intent categories:", len(intents))
+print("Number of intent categories:", len(intents))  # Debug info printed to console
+
 
 # Extract and display patterns/tags info
 def prepare_training_data():
