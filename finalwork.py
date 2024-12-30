@@ -7,7 +7,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import LabelEncoder
 import ssl
-from datetime import datetime, UTC
+from datetime import datetime, timezone
 
 # Page configuration
 st.set_page_config(
@@ -16,6 +16,7 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded"
 )
+
 # Handle SSL certification for Streamlit cloud deployment
 ssl._create_default_https_context = ssl._create_unverified_context
 
@@ -151,5 +152,3 @@ elif choice == "About":
     - Technical specifications explanation
     - Gaming laptop suggestions
     """)
-
-
