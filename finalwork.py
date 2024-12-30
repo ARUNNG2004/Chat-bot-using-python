@@ -28,20 +28,20 @@ def simple_tokenize(text):
     # Split on whitespace and filter out empty strings
     return [token for token in text.split() if token.strip()]
 
-# Common English stop words
-STOP_WORDS = set(['i', 'me', 'my', 'myself', 'we', 'our', 'ours', 'ourselves', 'you', 
-                  "you're", "you've", "you'll", "you'd", 'your', 'yours', 'yourself', 
-                  'yourselves', 'he', 'him', 'his', 'himself', 'she', "she's", 'her', 
-                  'hers', 'herself', 'it', "it's", 'its', 'itself', 'they', 'them', 
-                  'their', 'theirs', 'themselves', 'what', 'which', 'who', 'whom', 
-                  'this', 'that', "that'll", 'these', 'those', 'am', 'is', 'are', 
-                  'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'having', 
-                  'do', 'does', 'did', 'doing', 'a', 'an', 'the', 'and', 'but', 'if', 
-                  'or', 'because', 'as', 'until', 'while', 'of', 'at', 'by', 'for', 
-                  'with', 'about', 'against', 'between', 'into', 'through', 'during', 
-                  'before', 'after', 'above', 'below', 'to', 'from', 'up', 'down', 
-                  'in', 'out', 'on', 'off', 'over', 'under', 'again', 'further', 
-                  'then', 'once'])
+# Common English stop words as a list, not a set
+STOP_WORDS = ['i', 'me', 'my', 'myself', 'we', 'our', 'ours', 'ourselves', 'you', 
+              "you're", "you've", "you'll", "you'd", 'your', 'yours', 'yourself', 
+              'yourselves', 'he', 'him', 'his', 'himself', 'she', "she's", 'her', 
+              'hers', 'herself', 'it', "it's", 'its', 'itself', 'they', 'them', 
+              'their', 'theirs', 'themselves', 'what', 'which', 'who', 'whom', 
+              'this', 'that', "that'll", 'these', 'those', 'am', 'is', 'are', 
+              'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'having', 
+              'do', 'does', 'did', 'doing', 'a', 'an', 'the', 'and', 'but', 'if', 
+              'or', 'because', 'as', 'until', 'while', 'of', 'at', 'by', 'for', 
+              'with', 'about', 'against', 'between', 'into', 'through', 'during', 
+              'before', 'after', 'above', 'below', 'to', 'from', 'up', 'down', 
+              'in', 'out', 'on', 'off', 'over', 'under', 'again', 'further', 
+              'then', 'once']
 
 # Default intents
 DEFAULT_INTENTS = [
@@ -92,12 +92,12 @@ def prepare_training_data():
 
 patterns, tags = prepare_training_data()
 
-# Initialize vectorizer with custom tokenizer
+# Initialize vectorizer with custom tokenizer and list of stop words
 @st.cache_resource
 def create_vectorizer():
     return TfidfVectorizer(
         tokenizer=simple_tokenize,
-        stop_words=STOP_WORDS,
+        stop_words='english',  # Using built-in English stop words instead of custom list
         min_df=1,
         max_features=5000
     )
