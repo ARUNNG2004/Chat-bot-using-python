@@ -1,0 +1,290 @@
+[
+  {
+    "tag": "greeting",
+    "patterns": ["Hi", "Hello", "Hey", "How are you", "What's up", "Hi there", "Hello there", "Good morning", "Good evening", "Hey buddy"],
+    "responses": ["Hi there!", "Hello!", "Hey!", "I'm fine, thank you!", "Nothing much. How about you?"]
+  },
+  {
+    "tag": "goodbye",
+    "patterns": ["Bye", "See you later", "Goodbye", "Take care", "Catch you later", "Farewell", "See ya", "Bye bye", "Later", "Goodnight"],
+    "responses": ["Goodbye!", "See you later!", "Take care!", "Have a great day!", "Stay safe!"]
+  },
+  {
+    "tag": "thanks",
+    "patterns": ["Thank you", "Thanks", "Thanks a lot", "I appreciate it", "Much obliged", "Many thanks", "Thanks so much", "Thanks for the help", "Grateful", "Cheers"],
+    "responses": ["You're welcome!", "No problem!", "Glad I could help!", "Anytime!", "Happy to assist!"]
+  },
+  {
+    "tag": "about",
+    "patterns": ["name", "Who are you", "What are you", "What is your purpose", "Can you tell me about yourself", "What services do you provide", "Describe yourself"],
+    "responses": ["I am a chatbot.", "My purpose is to assist you.", "I can answer questions and provide assistance.", "I'm here to make your life easier.", "I help with common queries and tasks."]
+  },
+  {
+    "tag": "help",
+    "patterns": ["Help", "I need help", "Can you help me", "What should I do", "Assist me", "Can I get some help", "Need assistance", "Can you guide me", "Help me out", "What can I do"],
+    "responses": ["Sure, what do you need help with?", "I'm here to help. What's the problem?", "How can I assist you?", "Tell me your issue, and I'll try my best to help.", "Let's solve this together. How can I help?"]
+  },
+  {
+    "tag": "laptop_features",
+    "patterns": ["What features should I look for in a laptop?", "How do I choose a laptop?", "What specifications are important in a laptop?", "What makes a laptop good?", "What should I consider when buying a laptop?", "Tell me about laptop specs", "Important things in a laptop", "Which specs are best?"],
+    "responses": ["Consider the processor (e.g., Intel i5/i7, AMD Ryzen), RAM size (8GB or 16GB for multitasking), and storage type (SSD for faster performance).", "Look for a good display (Full HD or higher), battery life, and weight if you need portability.", "Graphics cards are important for gaming or design, while regular users can opt for integrated graphics."]
+  },
+  {
+    "tag": "laptop_budget",
+    "patterns": ["What is a good budget for a laptop?", "How much should I spend on a laptop?", "Are budget laptops good?", "Can I get a good laptop under $500?", "How much does a good laptop cost?", "What price range is ideal for laptops?", "Cheap laptops worth buying", "Laptop price guide"],
+    "responses": ["For basic use like browsing and document editing, you can find laptops under $500.", "For moderate use or light gaming, a budget of $600-$1000 is reasonable.", "For heavy tasks like video editing or gaming, consider laptops above $1000 with higher specifications."]
+  },
+  {
+    "tag": "laptop_brands",
+    "patterns": ["Which laptop brands are the best?", "What are reliable laptop brands?", "Can you recommend a laptop brand?", "Best laptop brands in the market", "Top laptop companies", "What brand should I choose?", "Are branded laptops better?", "Best laptop manufacturers"],
+    "responses": ["Top brands include Dell, HP, Lenovo, ASUS, and Apple. Each offers different models catering to various needs.", "For durability and business use, consider Lenovo ThinkPads. For gaming, ASUS and Acer Predator are good options.", "Apple MacBooks are great for creatives but come at a premium price."]
+  },
+  {
+    "tag": "gaming_laptops",
+    "patterns": ["What is a good laptop for gaming?", "Can you recommend a gaming laptop?", "What specs are needed for gaming?", "Gaming laptop recommendations", "Best laptops for gamers", "What GPU is good for gaming?", "Gaming performance laptops", "Top gaming machines"],
+    "responses": ["Gaming laptops should have a powerful GPU (e.g., NVIDIA RTX series), high refresh rate displays, and a strong cooling system.", "Popular gaming laptops include ASUS ROG, Acer Predator, and Dell Alienware.", "Ensure at least 16GB RAM, an SSD, and a processor like Intel i7 or AMD Ryzen 7."]
+  },
+  {
+    "tag": "laptop_usage",
+    "patterns": ["What type of laptop is good for students?", "Which laptop is best for video editing?", "What laptop is suitable for work from home?", "Best laptop for students", "Laptop for professionals", "What to use for remote work?", "Creative laptops", "Work laptops guide"],
+    "responses": ["For students, lightweight laptops with long battery life like the MacBook Air or Dell XPS are ideal.", "For video editing, look for laptops with a dedicated GPU (e.g., NVIDIA), high-resolution displays, and fast processors.", "For remote work, consider laptops with a good webcam, comfortable keyboard, and reliable battery life."]
+  },
+  {
+    "tag": "laptop_accessories",
+    "patterns": ["What accessories do I need for a laptop?", "Essential laptop accessories", "What extras should I buy with a laptop?", "Laptop accessory guide"],
+    "responses": ["Accessories include a good laptop bag, mouse, cooling pad, external storage, and a USB hub.", "For work, consider an external monitor, keyboard, and ergonomic stand.", "Headphones or speakers are great for entertainment."]
+  },   {
+    "tag": "dell_laptops",
+    "patterns": [
+        "What are the popular Dell laptop models?",
+        "List Dell laptops",
+        "Best Dell laptops",
+        "Dell laptop guide"
+    ],
+    "responses": [
+        "Popular Dell models include Dell XPS 13, Dell Inspiron 15, Dell Latitude 7420, Dell G15 for gaming, and Dell Alienware series for high-end gaming."
+    ]
+},
+{
+    "tag": "hp_laptops",
+    "patterns": [
+        "What are the best HP laptop models?",
+        "List HP laptops",
+        "Top HP laptops",
+        "HP laptop suggestions"
+    ],
+    "responses": [
+        "Top HP models are HP Spectre x360, HP Envy 13, HP Omen 15, HP Pavilion 14, and HP EliteBook series for professionals."
+    ]
+},
+{
+    "tag": "lenovo_laptops",
+    "patterns": [
+        "What are the popular Lenovo laptop models?",
+        "List Lenovo laptops",
+        "Best Lenovo laptops",
+        "Lenovo laptop recommendations"
+    ],
+    "responses": [
+        "Popular Lenovo models include Lenovo ThinkPad X1 Carbon, Lenovo Yoga 9i, Lenovo Legion 5 Pro for gaming, Lenovo IdeaPad 5, and Lenovo Flex series."
+    ]
+},
+{
+    "tag": "asus_laptops",
+    "patterns": [
+        "What are the best Asus laptop models?",
+        "List Asus laptops",
+        "Top Asus laptops",
+        "Asus laptop suggestions"
+    ],
+    "responses": [
+        "Top Asus models are Asus ROG Zephyrus G14 for gaming, Asus ZenBook 14, Asus VivoBook series, Asus TUF Gaming A15, and Asus ProArt StudioBook for creators."
+    ]
+},
+{
+    "tag": "apple_laptops",
+    "patterns": [
+        "What are the popular Apple laptop models?",
+        "List Apple laptops",
+        "Best Apple laptops",
+        "Apple MacBook guide"
+    ],
+    "responses": [
+        "Popular Apple models include MacBook Air with M2 chip, MacBook Pro 14-inch, MacBook Pro 16-inch, and older MacBook Pro models with Intel processors."
+    ]
+},
+{
+    "tag": "acer_laptops",
+    "patterns": [
+        "What are the best Acer laptop models?",
+        "List Acer laptops",
+        "Top Acer laptops",
+        "Acer laptop suggestions"
+    ],
+    "responses": [
+        "Top Acer models are Acer Predator Helios 300 for gaming, Acer Swift 3, Acer Aspire 5, Acer ConceptD series for creators, and Acer Chromebook Spin."
+    ]
+},
+{
+    "tag": "msi_laptops",
+    "patterns": [
+        "What are the popular MSI laptop models?",
+        "List MSI laptops",
+        "Best MSI laptops",
+        "MSI laptop guide"
+    ],
+    "responses": [
+        "Popular MSI models include MSI GE76 Raider for gaming, MSI Stealth 15M, MSI Modern 14 for productivity, and MSI Creator Z16 for content creation."
+    ]
+},
+  {
+      "tag": "laptop_overheating",
+      "patterns": [
+          "Why is my laptop overheating?",
+          "How to fix overheating laptops?",
+          "Laptop heating up too much",
+          "Laptop temperature issues"
+      ],
+      "responses": [
+          "Ensure your laptop vents are not blocked and use it on a hard surface.",
+          "Clean the dust from the cooling fan and vents.",
+          "Consider using a cooling pad for better airflow.",
+          "Check and replace the thermal paste if needed."
+      ]
+  },
+  {
+      "tag": "battery_issues",
+      "patterns": [
+          "Why does my laptop battery drain quickly?",
+          "How to fix battery problems?",
+          "Laptop battery not charging fully",
+          "Battery life issues"
+      ],
+      "responses": [
+          "Reduce screen brightness and disable unnecessary background applications.",
+          "Check if the charger or battery is faulty and replace them if needed.",
+          "Avoid overcharging and completely draining the battery frequently.",
+          "Update your laptop's power management settings and drivers."
+      ]
+  },
+  {
+      "tag": "slow_performance",
+      "patterns": [
+          "Why is my laptop so slow?",
+          "How to fix slow laptop performance?",
+          "Laptop lagging issues",
+          "Laptop running slow"
+      ],
+      "responses": [
+          "Close unused applications and clear temporary files.",
+          "Upgrade RAM or switch to an SSD for better performance.",
+          "Run a full system scan for malware or viruses.",
+          "Uninstall unnecessary programs and optimize startup programs."
+      ]
+  },
+  {
+      "tag": "wifi_connection_issues",
+      "patterns": [
+          "Why won't my laptop connect to WiFi?",
+          "Laptop WiFi issues",
+          "How to fix WiFi connection problems?",
+          "Laptop not detecting WiFi networks"
+      ],
+      "responses": [
+          "Restart your router and laptop to refresh the connection.",
+          "Ensure your WiFi drivers are up to date.",
+          "Forget the network and reconnect by entering the password again.",
+          "Disable and re-enable the WiFi adapter from the device manager."
+      ]
+  },
+  {
+      "tag": "blue_screen_of_death",
+      "patterns": [
+          "What causes the blue screen of death?",
+          "How to fix BSOD on a laptop?",
+          "Laptop crashes with a blue screen",
+          "BSOD errors on laptops"
+      ],
+      "responses": [
+          "Update your device drivers and ensure your OS is up to date.",
+          "Run a hardware diagnostic test to check for faulty components.",
+          "Check for overheating and clean the cooling system if necessary.",
+          "Restore your system to an earlier point if the issue started after a recent change."
+      ]
+  },
+  {
+      "tag": "keyboard_issues",
+      "patterns": [
+          "Why isn't my laptop keyboard working?",
+          "Laptop keyboard not responding",
+          "How to fix keyboard problems?",
+          "Laptop keys are not typing"
+      ],
+      "responses": [
+          "Check for debris under the keys and clean it gently.",
+          "Ensure the keyboard drivers are updated.",
+          "Use an external keyboard to confirm if the issue is hardware-related.",
+          "Consider replacing the keyboard if it is damaged."
+      ]
+  },
+  {
+      "tag": "screen_flickering",
+      "patterns": [
+          "Why is my laptop screen flickering?",
+          "How to fix screen flickering issues?",
+          "Laptop screen not stable",
+          "Laptop display problems"
+      ],
+      "responses": [
+          "Update your graphics drivers and adjust the screen refresh rate.",
+          "Check if the flickering happens in safe mode to diagnose driver issues.",
+          "Ensure the display cable connection is secure if it's a hardware issue.",
+          "Replace the screen if it is physically damaged."
+      ]
+  },
+  {
+      "tag": "hard_drive_failure",
+      "patterns": [
+          "What causes hard drive failure?",
+          "How to fix hard drive issues?",
+          "Laptop hard disk not detected",
+          "Laptop storage problems"
+      ],
+      "responses": [
+          "Run a disk diagnostic tool to check the health of your hard drive.",
+          "Backup important data immediately to prevent loss.",
+          "Check the SATA/SSD cable connection for physical issues.",
+          "Consider replacing the hard drive if it shows signs of failure."
+      ]
+  },
+  {
+      "tag": "no_sound",
+      "patterns": [
+          "Why is there no sound on my laptop?",
+          "Laptop sound not working",
+          "How to fix audio issues?",
+          "Laptop speakers not working"
+      ],
+      "responses": [
+          "Ensure the volume is not muted or too low.",
+          "Check if the audio drivers are updated and functioning.",
+          "Test with headphones to determine if the speakers are faulty.",
+          "Run the Windows troubleshooter for sound issues."
+      ]
+  },
+  {
+      "tag": "usb_port_not_working",
+      "patterns": [
+          "Why isn't my laptop USB port working?",
+          "Laptop USB port not detecting devices",
+          "How to fix USB port issues?",
+          "USB not recognized by laptop"
+      ],
+      "responses": [
+          "Restart your laptop and try reconnecting the device.",
+          "Check if the USB drivers are up to date.",
+          "Inspect the port for physical damage or debris.",
+          "Use another port to determine if the issue is with the specific port or the device."
+      ]
+  }
+]
