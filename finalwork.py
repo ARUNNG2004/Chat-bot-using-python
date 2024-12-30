@@ -18,35 +18,80 @@ st.set_page_config(
 )
 
 # Handle SSL certification for Streamlit cloud deployment
-ssl._create_default_https_context = ssl._create_unverified_context
+try:
+    ssl._create_default_https_context = ssl._create_unverified_context
+except:
+    pass
 
-# Ensure the correct tokenizer and stopwords are downloaded
-nltk.download('punkt', quiet=True)
-nltk.download('stopwords', quiet=True)
+# Download NLTK data with error handling
+try:
+    nltk.download('punkt', quiet=True)
+    nltk.download('stopwords', quiet=True)
+except Exception as e:
+    st.warning(f"NLTK Download Warning: {e}")
+
+# Default intents in case JSON file is missing
+DEFAULT_INTENTS = [
+    {
+        "tag": "greeting",
+        "patterns": ["Hi", "Hello", "Hey", "How are you", "Is anyone there?"],
+        "responses": [
+            "Hello! I'm here to help you with laptop recommendations.",
+            "Hi there! How can I assist you with finding the right laptop?",
+            "Hey! What kind of laptop are you looking for?"
+        ]
+    },
+    {
+        "tag": "goodbye",
+        "patterns": ["Bye", "See you", "Goodbye", "Thanks", "Thank you"],
+        "responses": [
+            "Goodbye! Feel free to return if you need more help.",
+            "Thanks for using our service. Have a great day!",
+            "You're welcome! Come back anytime."
+        ]
+    }
+]
 
 # Load JSON file with error handling
-try:
-    with open('laptop.json', 'r') as file:
-        intents = json.load(file)
-except FileNotFoundError:
-    st.error("The JSON file 'laptop.json' was not found. Please ensure the file exists in the same directory.")
-    intents = []
-except json.JSONDecodeError as e:
-    st.error(f"Error decoding JSON: {e}")
-    intents = []
+@st.cache_data
+def load_intents():
+    try:
+        with open('laptop.json', 'r', encoding='utf-8') as file:
+            return json.load(file)
+    except FileNotFoundError:
+        st.warning("Using default responses as 'laptop.json' was not found.")
+        return DEFAULT_INTENTS
+    except json.JSONDecodeError as e:
+        st.error(f"Error decoding JSON: {e}")
+        return DEFAULT_INTENTS
 
-# Extract patterns and tags if intents exist
-patterns = []
-tags = []
-if intents:
+intents = load_intents()
+
+# Extract patterns and tags
+def prepare_training_data():
+    patterns = []
+    tags = []
     for intent in intents:
         for pattern in intent.get("patterns", []):
             patterns.append(pattern)
             tags.append(intent.get("tag", "unknown"))
+    return patterns, tags
 
-# Text vectorization with stopwords
-stop_words = 'english'  # Using string instead of set
-vectorizer = TfidfVectorizer(tokenizer=nltk.word_tokenize, stop_words=stop_words)
+patterns, tags = prepare_training_data()
+
+# Initialize vectorizer with specific parameters
+@st.cache_resource
+def create_vectorizer():
+    return TfidfVectorizer(
+        tokenizer=nltk.word_tokenize,
+        stop_words='english',
+        min_df=1,
+        max_features=5000
+    )
+
+vectorizer = create_vectorizer()
+
+# Vectorize patterns with error handling
 try:
     if patterns:
         X = vectorizer.fit_transform(patterns)
@@ -63,35 +108,47 @@ try:
     if tags:
         y = tag_encoder.fit_transform(tags)
     else:
-        y = []
+        y = None
 except Exception as e:
     st.error(f"Tag encoding error: {e}")
-    y = []
+    y = None
 
-# Train model with optimized settings
-model = LogisticRegression(max_iter=200)
-if X is not None and len(y) > 0:
-    try:
-        model.fit(X, y)
-    except Exception as e:
-        st.error(f"Model training error: {e}")
+# Initialize and train model
+@st.cache_resource
+def train_model(_X, _y):
+    if _X is not None and _y is not None and len(set(_y)) > 1:
+        try:
+            model = LogisticRegression(max_iter=1000)
+            model.fit(_X, _y)
+            return model
+        except Exception as e:
+            st.error(f"Model training error: {e}")
+    return None
+
+model = train_model(X, y)
 
 def get_response(user_input):
-    """Generate chatbot response"""
-    if not intents:
-        return "The chatbot is not configured correctly. Please check the intents file."
+    """Generate chatbot response with comprehensive error handling"""
+    if not model:
+        print( "I'm still learning. Please try again in a moment.")
+    
     try:
-        user_vector = vectorizer.transform([user_input])
-        intent_index = model.predict(user_vector)[0]
-        intent_tag = tag_encoder.inverse_transform([intent_index])[0]
-
+        # Preprocess and vectorize user input
+        processed_input = vectorizer.transform([user_input])
+        
+        # Predict intent
+        intent_index = model.predict(processed_input)[0]
+        predicted_tag = tag_encoder.inverse_transform([intent_index])[0]
+        
+        # Find matching intent and return random response
         for intent in intents:
-            if intent["tag"] == intent_tag:
+            if intent["tag"] == predicted_tag:
                 return random.choice(intent["responses"])
+        
+        else: "I'm not sure how to respond to that. Could you rephrase your question?"
+    
     except Exception as e:
-        return f"I'm sorry, I encountered an error: {str(e)}"
-
-    return "I'm sorry, I didn't understand that."
+        return f"I encountered an error processing your request. Please try again with a different question."
 
 # Initialize session state
 if 'conversation_history' not in st.session_state:
@@ -105,50 +162,71 @@ st.subheader("Intelligent Laptop Recommendations & Support")
 menu = ["Home", "Conversation History", "About"]
 choice = st.sidebar.selectbox("Menu", menu)
 
+# Display current time
+st.sidebar.write(f"Current Time (UTC): {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S')}")
+st.sidebar.write(f"User: ARUNNG2004")
+
 if choice == "Home":
     st.subheader("Chat with the Bot")
-
+    
     # Input for user query
     user_input = st.text_input("You:", placeholder="Type your message here...")
+    
     if user_input:
-        # Get the bot's response
-        response = get_response(user_input)
-
-        # Save to conversation history with consistent keys
-        st.session_state.conversation_history.append({
-            "user_message": user_input,
-            "bot_response": response
-        })
-
-        # Display current exchange
-        st.markdown(f"**Bot**: {response}")
+        user_input = user_input.strip()
+        if len(user_input) < 2:
+            st.warning("Please enter a longer message.")
+        else:
+            with st.spinner('Getting response...'):
+                response = get_response(user_input)
+                
+                # Save to conversation history
+                st.session_state.conversation_history.append({
+                    "timestamp": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S"),
+                    "user_message": user_input,
+                    "bot_response": response
+                })
+                
+                # Display current exchange
+                st.write("**You:**", user_input)
+                st.write("**Bot:**", response)
 
 elif choice == "Conversation History":
     st.subheader("Chat History")
-
-    # Restart button to reset conversation history
+    
     if st.button("Clear History"):
         st.session_state.conversation_history = []
         st.success("Conversation history cleared!")
-
-    # Display conversation history
+    
     if st.session_state.conversation_history:
-        for idx, chat in enumerate(st.session_state.conversation_history):
-            with st.expander(f"Conversation {idx + 1}"):
-                st.write(f"**You**: {chat['user_message']}")
-                st.write(f"**Bot**: {chat['bot_response']}")
+        for idx, chat in enumerate(reversed(st.session_state.conversation_history)):
+            with st.expander(f"Conversation {len(st.session_state.conversation_history) - idx}"):
+                st.write(f"**Time:** {chat['timestamp']}")
+                st.write(f"**You:** {chat['user_message']}")
+                st.write(f"**Bot:** {chat['bot_response']}")
     else:
         st.info("No conversation history available.")
 
 elif choice == "About":
-    st.subheader("About the Chatbot")
+    st.subheader("About the Laptop Advisor Chatbot")
     st.write("""
-    This chatbot helps you with laptop buying recommendations, budget tips, and technical specifications.
-    It uses Natural Language Processing (NLP) and Machine Learning to understand your queries and provide relevant responses.
-
-    Features:
-    - Laptop recommendations based on your needs
-    - Budget-friendly options
-    - Technical specifications explanation
-    - Gaming laptop suggestions
+    Welcome to the AI Laptop Advisor! This intelligent chatbot is designed to help you:
+    
+    - Find the perfect laptop based on your needs
+    - Get recommendations within your budget
+    - Understand technical specifications
+    - Compare different laptop models
+    - Learn about the latest laptop trends
+    
+    The chatbot uses Natural Language Processing (NLP) and Machine Learning to understand
+    your queries and provide relevant, personalized responses.
+  
+    """)
+    
+    st.markdown("### How to Use")
+    st.write("""
+    1. Type your question about laptops in the chat input
+    2. Get instant, relevant recommendations
+    3. View your chat history anytime
+    4. Clear history when needed
     """)
