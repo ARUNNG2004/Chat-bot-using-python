@@ -130,7 +130,7 @@ model = train_model(X, y)
 def get_response(user_input):
     """Generate chatbot response with comprehensive error handling"""
     if not model:
-        print( "I'm still learning. Please try again in a moment.")
+        return "I'm still learning. Please try again in a moment."
     
     try:
         # Preprocess and vectorize user input
@@ -145,7 +145,7 @@ def get_response(user_input):
             if intent["tag"] == predicted_tag:
                 return random.choice(intent["responses"])
         
-        else: "I'm not sure how to respond to that. Could you rephrase your question?"
+        return "I'm not sure how to respond to that. Could you rephrase your question?"
     
     except Exception as e:
         return f"I encountered an error processing your request. Please try again with a different question."
@@ -220,7 +220,7 @@ elif choice == "About":
     
     The chatbot uses Natural Language Processing (NLP) and Machine Learning to understand
     your queries and provide relevant, personalized responses.
-  
+
     """)
     
     st.markdown("### How to Use")
