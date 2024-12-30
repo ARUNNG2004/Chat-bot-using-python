@@ -1,18 +1,12 @@
 import os
-import nltk
 import random
 import json
 import streamlit as st
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import LabelEncoder
-import ssl
 from datetime import datetime, timezone
-from nltk.tokenize import word_tokenize
-import warnings
-
-# Suppress NLTK download messages
-warnings.filterwarnings('ignore')
+import re
 
 # Page configuration
 st.set_page_config(
@@ -22,47 +16,34 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom tokenizer that falls back to basic splitting if NLTK fails
-def safe_tokenize(text):
-    try:
-        return word_tokenize(text)
-    except:
-        return text.lower().split()
+# Custom tokenizer function
+def simple_tokenize(text):
+    """
+    Simple tokenizer that splits text into words and handles basic cleaning
+    """
+    # Convert to lowercase
+    text = text.lower()
+    # Replace any non-alphanumeric characters with spaces
+    text = re.sub(r'[^a-z0-9\s]', ' ', text)
+    # Split on whitespace and filter out empty strings
+    return [token for token in text.split() if token.strip()]
 
-# Initialize NLTK data
-@st.cache_resource
-def setup_nltk():
-    try:
-        # Create NLTK data directory if it doesn't exist
-        nltk_data_dir = os.path.join(os.path.expanduser("~"), "nltk_data")
-        os.makedirs(nltk_data_dir, exist_ok=True)
-        
-        # Download required NLTK data
-        for resource in ['punkt', 'stopwords']:
-            try:
-                nltk.download(resource, quiet=True, download_dir=nltk_data_dir)
-            except Exception as e:
-                st.warning(f"Failed to download {resource}: {str(e)}")
-        
-        # Verify downloads
-        try:
-            from nltk.corpus import stopwords
-            from nltk.tokenize import word_tokenize
-            word_tokenize("Test sentence")
-            stopwords.words('english')
-            return True
-        except Exception as e:
-            st.error(f"NLTK verification failed: {str(e)}")
-            return False
-            
-    except Exception as e:
-        st.error(f"NLTK setup failed: {str(e)}")
-        return False
+# Common English stop words
+STOP_WORDS = set(['i', 'me', 'my', 'myself', 'we', 'our', 'ours', 'ourselves', 'you', 
+                  "you're", "you've", "you'll", "you'd", 'your', 'yours', 'yourself', 
+                  'yourselves', 'he', 'him', 'his', 'himself', 'she', "she's", 'her', 
+                  'hers', 'herself', 'it', "it's", 'its', 'itself', 'they', 'them', 
+                  'their', 'theirs', 'themselves', 'what', 'which', 'who', 'whom', 
+                  'this', 'that', "that'll", 'these', 'those', 'am', 'is', 'are', 
+                  'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'having', 
+                  'do', 'does', 'did', 'doing', 'a', 'an', 'the', 'and', 'but', 'if', 
+                  'or', 'because', 'as', 'until', 'while', 'of', 'at', 'by', 'for', 
+                  'with', 'about', 'against', 'between', 'into', 'through', 'during', 
+                  'before', 'after', 'above', 'below', 'to', 'from', 'up', 'down', 
+                  'in', 'out', 'on', 'off', 'over', 'under', 'again', 'further', 
+                  'then', 'once'])
 
-# Initialize NLTK
-nltk_ready = setup_nltk()
-
-# Default intents remain the same as in your original code
+# Default intents
 DEFAULT_INTENTS = [
     {
         "tag": "greeting",
@@ -111,12 +92,12 @@ def prepare_training_data():
 
 patterns, tags = prepare_training_data()
 
-# Initialize vectorizer with fallback tokenizer
+# Initialize vectorizer with custom tokenizer
 @st.cache_resource
 def create_vectorizer():
     return TfidfVectorizer(
-        tokenizer=safe_tokenize,
-        stop_words='english',
+        tokenizer=simple_tokenize,
+        stop_words=STOP_WORDS,
         min_df=1,
         max_features=5000
     )
@@ -182,4 +163,82 @@ def get_response(user_input):
     except Exception as e:
         return f"I encountered an error processing your request. Please try again with a different question."
 
-# Rest of the Streamlit UI code remains the same as in your original version
+# Initialize session state
+if 'conversation_history' not in st.session_state:
+    st.session_state.conversation_history = []
+
+# Main title and description
+st.title("AI Laptop Advisor")
+st.subheader("Intelligent Laptop Recommendations & Support")
+
+# Sidebar menu
+menu = ["Home", "Conversation History", "About"]
+choice = st.sidebar.selectbox("Menu", menu)
+
+# Display current time
+st.sidebar.write(f"Current Time (UTC): {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S')}")
+st.sidebar.write(f"User: ARUNNG2004")
+
+if choice == "Home":
+    st.subheader("Chat with the Bot")
+    
+    # Input for user query
+    user_input = st.text_input("You:", placeholder="Type your message here...")
+    
+    if user_input:
+        user_input = user_input.strip()
+        if len(user_input) < 2:
+            st.warning("Please enter a longer message.")
+        else:
+            with st.spinner('Getting response...'):
+                response = get_response(user_input)
+                
+                # Save to conversation history
+                st.session_state.conversation_history.append({
+                    "timestamp": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S"),
+                    "user_message": user_input,
+                    "bot_response": response
+                })
+                
+                # Display current exchange
+                st.write("**You:**", user_input)
+                st.write("**Bot:**", response)
+
+elif choice == "Conversation History":
+    st.subheader("Chat History")
+    
+    if st.button("Clear History"):
+        st.session_state.conversation_history = []
+        st.success("Conversation history cleared!")
+    
+    if st.session_state.conversation_history:
+        for idx, chat in enumerate(reversed(st.session_state.conversation_history)):
+            with st.expander(f"Conversation {len(st.session_state.conversation_history) - idx}"):
+                st.write(f"**Time:** {chat['timestamp']}")
+                st.write(f"**You:** {chat['user_message']}")
+                st.write(f"**Bot:** {chat['bot_response']}")
+    else:
+        st.info("No conversation history available.")
+
+elif choice == "About":
+    st.subheader("About the Laptop Advisor Chatbot")
+    st.write("""
+    Welcome to the AI Laptop Advisor! This intelligent chatbot is designed to help you:
+    
+    - Find the perfect laptop based on your needs
+    - Get recommendations within your budget
+    - Understand technical specifications
+    - Compare different laptop models
+    - Learn about the latest laptop trends
+    
+    The chatbot uses Natural Language Processing (NLP) and Machine Learning to understand
+    your queries and provide relevant, personalized responses.
+    """)
+    
+    st.markdown("### How to Use")
+    st.write("""
+    1. Type your question about laptops in the chat input
+    2. Get instant, relevant recommendations
+    3. View your chat history anytime
+    4. Clear history when needed
+    """)
