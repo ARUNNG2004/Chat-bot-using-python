@@ -168,7 +168,7 @@ def get_response(user_input):
                 st.sidebar.write("Found matching intent")
                 return response
         
-        return "I'm not sure how to respond to that. Could you rephrase your question?"
+            else: "I'm not sure how to respond to that. Could you rephrase your question?"
     
     except Exception as e:
         st.sidebar.error(f"Response error: {str(e)}")
