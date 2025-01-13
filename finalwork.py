@@ -152,7 +152,7 @@ model = train_model(X, y)
 # Enhanced response function with debugging
 def get_response(user_input):
     if not model:
-        print( "I'm still learning. Please try again in a moment.")
+       return  "I'm still learning. Please try again in a moment."
     
     try:
         processed_input = vectorizer.transform([user_input])
@@ -169,7 +169,7 @@ def get_response(user_input):
                 return response
         
             else: 
-                print( "I'm not sure how to respond to that. Could you rephrase your question?")
+                 return  "I'm not sure how to respond to that. Could you rephrase your question?"
     
     except Exception as e:
         st.sidebar.error(f"Response error: {str(e)}")
